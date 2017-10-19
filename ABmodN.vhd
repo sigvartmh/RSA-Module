@@ -29,89 +29,97 @@ entity ABmodN is
     Port ( clk : in std_logic;
            rst : in std_logic;
            endmod : out std_logic;
-           startmod : in std_logic;
            A : in STD_LOGIC_VECTOR (127 downto 0);
-           Bk : in STD_LOGIC;
+           B : in STD_LOGIC_VECTOR (127 downto 0);
            N : in STD_LOGIC_VECTOR (127 downto 0);
-           P : inout STD_LOGIC_VECTOR (127 downto 0));
+           P : out STD_LOGIC_VECTOR (127 downto 0);
+           num : out std_logic_vector(8 downto 0);
+           start : in std_logic);
 end ABmodN;
 
 architecture Behavioral of ABmodN is
-signal Ai : STD_LOGIC_VECTOR(127 downto 0);
-signal Pi : STD_LOGIC_VECTOR(127 downto 0);
-signal P1 : STD_LOGIC_VECTOR(127 downto 0);
-signal P2 : STD_LOGIC_VECTOR(127 downto 0);
-signal start : std_logic;
+signal temp : STD_LOGIC_VECTOR(127 downto 0);
 signal i : integer;
+signal k : integer;
 
 begin
 
-AxBk : process (clk,start) is
-begin
-if(clk'event and clk = '1') then
-   if(start = '0') then
-       
-    else
-    Ai<= (others=>'0');
-        if(Bk = '1') then
-            Ai<=A;
-        end if;
-
-   end if;
-end if;
-end process;
-
-sum : process (clk,start) is
-begin
-if(clk'event and clk = '1') then
-   if(start = '0') then
-       
-    else
-    
-        P1<=P+P+Ai;
-
-   end if;
-end if;
-end process;
-
-mod1 : process (clk,start) is
-begin
-if(clk'event and clk = '1') then
-   if(start = '0') then
-       
-    else
-        P2<=P1;
-        if(P1>=N) then
-            P2<=P1-N;
-        end if;
-
-   end if;
-end if;
-end process;
-
-mod2 : process (clk,start) is
-begin
-if(clk'event and clk = '1') then
-   if(start = '0') then
-       
-    else
-        P<=P2;
-        if(P2>=N) then
-            P<=P2-N;
-        end if;
-
-   end if;
-end if;
-end process;
-
-strt : process(clk,rst) is
+calc : process (clk,rst) is
 begin
 if(clk'event and clk = '1') then
     if(rst = '1') then
-       start<='0';
+        temp <= (others=>'0');
+        P <= (others=>'0'); -- reset p
+        i <= 0; -- reset i
     else
-        start<='1';
+        
+    if(start = '1') then
+        
+        -- P = 2*P + A*b(128-1-i);
+      --  P <= P+P; -- *2 left shift
+         if temp < N then
+        if(i<128) then
+             if (B(127-i) = '1') then
+                  temp <= temp + temp + A;
+             else
+                   temp <= temp+temp;
+             end if;
+             
+             if(temp >= N) then
+                   temp<=temp-N;
+             end if;
+                     
+             if(temp >= N) then
+                   temp<=temp-N;
+             end if;
+            
+                 P <= temp;
+                 i<= i+1;
+        end if;
+        end if;
+        
+       if(temp >= N) then
+              temp<=temp-N;
+
+       end if;
+        
+                
+        if(temp >= N) then
+              temp<=temp-N;
+        end if;
+        
+        
+        
+        num <= std_logic_vector(to_unsigned(i,9));
+        -- end of loop
+        
+        if(i = 128) then
+           
+            i <= 0;
+        end if;
     end if;
+    end if;
+end if;
+end process;
+
+EOF : process(clk,rst)
+begin
+
+if(clk'event and clk = '1') then
+if(rst = '1') then
+        endmod <= '0';
+        k <= 0;
+else
+if(i>0)then
+    k<=1;
+end if;
+
+if((k = 1)and(i=0)) then
+ endmod <= '1';
+  k <= 0;
+end if;
+
+end if;
 end if;
 end process;
 
