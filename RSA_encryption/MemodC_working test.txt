@@ -1,0 +1,133 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date: 26.10.2017 10:43:01
+-- Design Name: 
+-- Module Name: MemodC - Behavioral
+-- Project Name: 
+-- Target Devices: 
+-- Tool Versions: 
+-- Description: 
+-- 
+-- Dependencies: 
+-- 
+-- Revision:
+-- Revision 0.01 - File Created
+-- Additional Comments:
+-- 
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.std_logic_unsigned.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity MemodC is
+  Port (M : in std_logic_vector(127 downto 0);
+        e : in std_logic_vector(127 downto 0);
+        N : in std_logic_vector(127 downto 0);
+        C : out std_logic_vector(127 downto 0);
+        startRSA : in std_logic;
+        endRSA : out std_logic;
+        clk : in std_logic;
+        rst : in std_logic;
+        endAB : out std_logic;
+        endmod : in std_logic;
+        ABproc : out std_logic);
+end MemodC;
+
+architecture Behavioral of MemodC is
+
+signal i : integer;
+signal startAB : std_logic;
+--signal endmod : std_logic;
+signal boucle : std_logic;
+
+signal A,B,P : std_logic_vector(127 downto 0);
+signal temp : STD_LOGIC_VECTOR(127 downto 0);
+signal num : std_logic_vector(8 downto 0);
+
+begin
+
+process(clk,rst,endmod)
+begin
+endAB<=endmod;  
+if(clk'event and clk = '1') then
+ABproc<=startAB;
+    if(rst = '1') then
+        C <= (others=>'0'); -- reset C
+        i <= 127; -- reset i
+        startAB<='0';
+        boucle <='0';
+        endAB<='0';
+    else
+        if(startRSA = '1') then
+        
+             if(i = 127) then
+                if(e(i) = '1') then
+                    C<=M;
+                else
+                    C<= (others=>'0');
+                    C(0)<='1';
+                end if;
+                i<=i-1;
+             
+             else
+             
+             if(startAB = '0' and endmod = '0') then
+                 if(boucle <= '0') then                     
+                     startAB <= '1';
+                     boucle <= '1';
+                     C<=(others=>'0');
+                     C(1)<='1';
+                 else
+                     C<=(others=>'0');
+                     C(2)<='1';                     
+                     if(e(i) = '1') then
+                         C<=(others=>'0');
+                         C(3)<='1';                                                 
+                         startAB <= '1';                         
+                     end if;
+                     i<=i-1;
+                     boucle <= '0';
+                 end if;
+             end if;
+             
+             if(endmod = '1')then 
+                 startAB <= '0';            
+             end if;
+                
+             end if;
+        end if;
+
+    end if;
+end if;
+end process;
+
+EOF : process(clk,rst)
+begin
+
+if(clk'event and clk = '1') then
+if(rst = '1') then
+endRSA<='0';
+else
+if(i=120) then
+ endRSA<='1';
+end if;
+
+end if;
+end if;
+end process;
+
+
+end Behavioral;
