@@ -1,0 +1,7 @@
+# compile vhdl design source files
+vhdl xil_defaultlib  "../../../RSA_encryption.srcs/sources_1/new/ABmodN.vhd"
+vhdl xil_defaultlib  "../../../RSA_encryption.srcs/sources_1/new/MemodC.vhd"
+vhdl xil_defaultlib  "../../../RSA_encryption.srcs/sim_1/new/MemodC_tb.vhd"
+
+# Do not sort compile order
+nosort
