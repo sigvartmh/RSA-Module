@@ -41,21 +41,23 @@ component MemodC is
   Port (M : in std_logic_vector(127 downto 0);
       e : in std_logic_vector(127 downto 0);
       N : in std_logic_vector(127 downto 0);
-      C : out std_logic_vector(127 downto 0);
-      startRSA : in std_logic;
+      C : buffer std_logic_vector(127 downto 0);
+      BeginCalc : in std_logic;
       endRSA : out std_logic;
       clk : in std_logic;
-      rst : in std_logic;
-      endAB : out std_logic;
-      pos : buffer std_logic_vector(1 downto 0);
-      startmod : out std_logic;
-      numC : out std_logic_vector(8 downto 0));
+      rstn : in std_logic
+      --endAB : out std_logic;
+      --pos : buffer std_logic_vector(1 downto 0);
+      --startmod : out std_logic
+      );
+      --numC : out std_logic_vector(8 downto 0));
 end component;
 
-signal clk,rst,startRSA,endRSA,endAB,startmod : std_logic;
+signal clk,rst,BeginCalc,endRSA : std_logic;
+--endAB,startmod
 signal e,N,C,M : std_logic_vector (127 downto 0);
 signal pos : std_logic_vector(1 downto 0);
-signal numC : std_logic_vector(8 downto 0);
+--signal numC : std_logic_vector(8 downto 0);
 
 
 begin
@@ -63,16 +65,17 @@ begin
 uut: MemodC
     port map (
         clk=>clk,
-        rst=>rst,
-        startRSA=>startRSA,
+        rstn=>rst,
+        BeginCalc=>BeginCalc,
         endRSA=>endRSA,
         e=>e,
         N=>N,
         C=>C,
-        M=>M,
-        endAB=>endAB,
-        pos=>pos,
-        startmod=>startmod,numC=>numC);
+        M=>M);
+        --endAB=>endAB,
+        --pos=>pos,
+        --startmod=>startmod);
+        --numC=>numC);
 --((128+4)*(128+4))*4ns = 69696ns
 
 clockgen : process
@@ -85,25 +88,25 @@ end process;
 
 reset : process
 begin
-    rst <= '1';
+    rst <= '0';
     
     wait for 20 ns;
-    rst <= '0';
+    rst <= '1';
     wait;
 end process;
 
 stimuli : process
 begin
-startRSA<='0';
+BeginCalc<='0';
 --e <=(others=>'1');
 e <= std_logic_vector(to_unsigned(2635,128)); -- "10100"  --20
 M <= std_logic_vector(to_unsigned(4896,128));
 N <= std_logic_vector(to_unsigned(63250,128)); -- "10010001"  --145
-wait until rst'event and rst = '0';
+wait until rst'event and rst = '1';
 wait for 20 ns;
-startRSA<='1';
+BeginCalc<='1';
 wait until endRSA'event and endRSA = '1';
-startRSA<='0';
+BeginCalc<='0';
 end process;
 
 

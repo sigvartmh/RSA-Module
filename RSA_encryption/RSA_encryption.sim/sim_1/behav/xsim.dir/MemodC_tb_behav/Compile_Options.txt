@@ -1,1 +1,0 @@
--wto "c41f2dbe1d984f2db8769405dfbe1aec" --debug "typical" --relax --mt "2" -L "xil_defaultlib" -L "secureip" --snapshot "MemodC_tb_behav" "xil_defaultlib.MemodC_tb" -log "elaborate.log" 
